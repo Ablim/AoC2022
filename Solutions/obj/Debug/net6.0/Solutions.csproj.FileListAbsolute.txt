@@ -1,0 +1,16 @@
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Solutions
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Solutions.deps.json
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Solutions.runtimeconfig.json
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Solutions.dll
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Solutions.pdb
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.csproj.AssemblyReference.cache
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.GeneratedMSBuildEditorConfig.editorconfig
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.AssemblyInfoInputs.cache
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.AssemblyInfo.cs
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.csproj.CoreCompileInputs.cache
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.dll
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/refint/Solutions.dll
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.pdb
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/Solutions.genruntimeconfig.cache
+/Users/albin/Work/AoC2022/Solutions/obj/Debug/net6.0/ref/Solutions.dll
+/Users/albin/Work/AoC2022/Solutions/bin/Debug/net6.0/Day1/Day1.txt
