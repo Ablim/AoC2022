@@ -13,9 +13,7 @@ public static class Solution
     {
         return data.Select(x => x.Split(' '))
             .Select(x => (char.Parse(x[0]), char.Parse(x[1])))
-            .Select(x => (x.Item1, GetPlannedMatchScore(x.Item2)))
-            .Select(x => (GetShapeScore(GetPlannedShape(x.Item1, x.Item2)), x.Item2))
-            .Select(x => x.Item1 + x.Item2)
+            .Select(x => GetShapeScore(GetPlannedShape(x.Item1, x.Item2)) + GetPlannedMatchScore(x.Item2))
             .Sum()
             .ToString();
     }
@@ -77,18 +75,18 @@ public static class Solution
             _ => throw new InvalidOperationException()
         };
 
-    private static char GetPlannedShape(char opponent, int matchScore) =>
-        (opponent, matchScore) switch
+    private static char GetPlannedShape(char opponent, char outcome) =>
+        (opponent, outcome) switch
         {
-            ('A', 0) => 'Z', // Rock loss
-            ('A', 3) => 'X', // Rock draw
-            ('A', 6) => 'Y', // Rock win
-            ('B', 0) => 'X', // Paper loss
-            ('B', 3) => 'Y', // Paper draw
-            ('B', 6) => 'Z', // Paper win
-            ('C', 0) => 'Y', // Scissor loss
-            ('C', 3) => 'Z', // Scissor draw
-            ('C', 6) => 'X', // Scissor win
+            ('A', 'X') => 'Z', // Rock loss
+            ('A', 'Y') => 'X', // Rock draw
+            ('A', 'Z') => 'Y', // Rock win
+            ('B', 'X') => 'X', // Paper loss
+            ('B', 'Y') => 'Y', // Paper draw
+            ('B', 'Z') => 'Z', // Paper win
+            ('C', 'X') => 'Y', // Scissor loss
+            ('C', 'Y') => 'Z', // Scissor draw
+            ('C', 'Z') => 'X', // Scissor win
             (_, _) => throw new InvalidOperationException()
         };
 }
