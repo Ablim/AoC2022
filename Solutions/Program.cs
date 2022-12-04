@@ -1,4 +1,4 @@
-﻿using Solutions.Day3;
+﻿using Solutions.Day4;
 
 Console.WriteLine("*** Advent of Code 2022 ***");
 
@@ -6,7 +6,7 @@ Console.WriteLine("*** Advent of Code 2022 ***");
 // var response = await client.GetAsync("https://adventofcode.com/2022/day/1/input");
 // var data = await response.Content.ReadAsStringAsync();
 
-var data = await File.ReadAllLinesAsync("Day3/Data.txt");
+var data = await File.ReadAllLinesAsync("Day4/Data.txt");
 
 var part1 = Solution.SolvePart1(data);
 var part2 = Solution.SolvePart2(data);
