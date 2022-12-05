@@ -3,7 +3,7 @@ using System.Net;
 using Solutions.Day5;
 
 const int day = 5;
-const string inputFile = "Input.txt";
+var inputFile = $"Input{day}.txt";
 
 if (!File.Exists(inputFile))
 {
