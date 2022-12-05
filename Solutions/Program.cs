@@ -1,18 +1,41 @@
-﻿using Solutions.Day5;
+﻿using System.Diagnostics;
+using System.Net;
+using Solutions.Day5;
 
-Console.WriteLine("*** Advent of Code 2022 ***");
+const int day = 5;
+const string inputFile = "Input.txt";
 
-// var client = new HttpClient();
-// var response = await client.GetAsync("https://adventofcode.com/2022/day/1/input");
-// var data = await response.Content.ReadAsStringAsync();
+if (!File.Exists(inputFile))
+{
+    var container = new CookieContainer();
+    var sessionCookie = await File.ReadAllTextAsync(".adventofcode.com");
+    container.Add(new Cookie("session", sessionCookie, string.Empty, ".adventofcode.com"));
+    var handler = new HttpClientHandler
+    {
+        CookieContainer = container
+    };
+    var client = new HttpClient(handler);
+    var response = await client.GetAsync($"https://adventofcode.com/2022/day/{day}/input");
+    var bytes = await response.Content.ReadAsByteArrayAsync();
+    await File.WriteAllBytesAsync(inputFile, bytes);
+}
 
-var data = await File.ReadAllLinesAsync("Day5/Data.txt");
+var data = await File.ReadAllLinesAsync(inputFile);
 
+Console.WriteLine("Advent of Code 2022");
+Console.WriteLine($"Day {day}");
+Console.WriteLine();
+
+var stopwatch = new Stopwatch();
+stopwatch.Start();
 var part1 = Solution.SolvePart1(data);
-var part2 = Solution.SolvePart2(data);
-
-Console.WriteLine("Part 1");
+stopwatch.Stop();
+Console.WriteLine($"Part 1 ({stopwatch.ElapsedMilliseconds} ms)");
 Console.WriteLine(part1);
 Console.WriteLine();
-Console.WriteLine("Part 1");
+
+stopwatch.Restart();
+var part2 = Solution.SolvePart2(data);
+stopwatch.Stop();
+Console.WriteLine($"Part 2 ({stopwatch.ElapsedMilliseconds} ms)");
 Console.WriteLine(part2);
