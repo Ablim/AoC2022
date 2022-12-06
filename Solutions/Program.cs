@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using Solutions.Day5;
+using Solutions.Day6;
 
-const int day = 5;
+const int day = 6;
 var inputFile = $"Input{day}.txt";
 
 if (!File.Exists(inputFile))
@@ -14,6 +14,7 @@ if (!File.Exists(inputFile))
     {
         CookieContainer = container
     };
+    
     var client = new HttpClient(handler);
     var response = await client.GetAsync($"https://adventofcode.com/2022/day/{day}/input");
     var bytes = await response.Content.ReadAsByteArrayAsync();
