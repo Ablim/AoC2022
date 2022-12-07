@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using Solutions.Day6;
+using Solutions.Day7;
 
-const int day = 6;
+const int day = 7;
 var inputFile = $"Input{day}.txt";
 
 if (!File.Exists(inputFile))
