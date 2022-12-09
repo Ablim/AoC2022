@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using Solutions.Day8;
+using Solutions.Day9;
 
-const int day = 8;
-var inputFile = $"Input{day}.txt";
+var inputFile = $"Input{Solution.Day}.txt";
 
 if (!File.Exists(inputFile))
 {
@@ -16,7 +15,7 @@ if (!File.Exists(inputFile))
     };
     
     var client = new HttpClient(handler);
-    var response = await client.GetAsync($"https://adventofcode.com/2022/day/{day}/input");
+    var response = await client.GetAsync($"https://adventofcode.com/2022/day/{Solution.Day}/input");
     var bytes = await response.Content.ReadAsByteArrayAsync();
     await File.WriteAllBytesAsync(inputFile, bytes);
 }
@@ -24,7 +23,7 @@ if (!File.Exists(inputFile))
 var data = await File.ReadAllLinesAsync(inputFile);
 
 Console.WriteLine("Advent of Code 2022");
-Console.WriteLine($"Day {day}");
+Console.WriteLine($"Day {Solution.Day}");
 Console.WriteLine();
 
 var stopwatch = new Stopwatch();
