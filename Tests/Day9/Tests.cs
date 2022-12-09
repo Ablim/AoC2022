@@ -15,8 +15,8 @@ public class Tests
     [Fact]
     public async Task Part2()
     {
-        var data = await File.ReadAllLinesAsync($"Day{Solution.Day}/Data.txt");
+        var data = await File.ReadAllLinesAsync($"Day{Solution.Day}/Data2.txt");
         var result = Solution.SolvePart2(data);
-        Assert.Equal("1", result);
+        Assert.Equal("36", result);
     }
 }
