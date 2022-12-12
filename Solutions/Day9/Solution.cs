@@ -57,11 +57,10 @@ public static class Solution
             var direction = parts[0];
             var steps = int.Parse(parts[1]);
             
-            Console.WriteLine(move);
+            // Console.WriteLine(move);
             
             while (steps > 0)
             {
-                Print(snake);
                 MoveHead(snake[0], direction);
 
                 for (var i = 0; i < 9; i++)
@@ -74,6 +73,8 @@ public static class Solution
                 
                 steps--;
             }
+            
+            // Print(snake);
         }
         
         return tailPositions.Count.ToString();
@@ -167,101 +168,33 @@ public static class Solution
     
     private static void Follow(Knot head, Knot tail)
     {
-        if (head.Row == tail.Row + 2)
+        var distance = Math.Sqrt(Math.Pow(head.Row - tail.Row, 2) + Math.Pow(head.Column - tail.Column, 2));
+        var step = (int)(distance / 2);
+
+        if (head.Row > tail.Row)
         {
-            if (head.Column == tail.Column)
-            {
-                tail.Row++;
-            }
-            else if (head.Column == tail.Column + 2)
-            {
-                tail.Row++;
-                tail.Column++;
-            }
-            else if (head.Column == tail.Column - 2)
-            {
-                tail.Row++;
-                tail.Column--;
-            }
-            else
-            {
-                tail.Row = head.PreviousRow;
-                tail.Column = head.PreviousColumn;
-            }
+            tail.Row += step;
         }
-        else if (head.Row == tail.Row - 2)
+        else if (head.Row < tail.Row)
         {
-            if (head.Column == tail.Column)
-            {
-                tail.Row--;
-            }
-            else if (head.Column == tail.Column + 2)
-            {
-                tail.Row--;
-                tail.Column++;
-            }
-            else if (head.Column == tail.Column - 2)
-            {
-                tail.Row--;
-                tail.Column--;
-            }
-            else
-            {
-                tail.Row = head.PreviousRow;
-                tail.Column = head.PreviousColumn;
-            }
+            tail.Row -= step;
         }
-        else if (head.Column == tail.Column + 2)
+
+        if (head.Column > tail.Column)
         {
-            if (head.Row == tail.Row)
-            {
-                tail.Column++;
-            }
-            else if (head.Row == tail.Row + 2)
-            {
-                tail.Row++;
-                tail.Column++;
-            }
-            else if (head.Row == tail.Row - 2)
-            {
-                tail.Row--;
-                tail.Column++;
-            }
-            else
-            {
-                tail.Row = head.PreviousRow;
-                tail.Column = head.PreviousColumn;
-            }
+            tail.Column += step;
         }
-        else if (head.Column == tail.Column - 2)
+        else if (head.Column < tail.Column)
         {
-            if (head.Row == tail.Row)
-            {
-                tail.Column--;
-            }
-            else if (head.Row == tail.Row + 2)
-            {
-                tail.Row++;
-                tail.Column--;
-            }
-            else if (head.Row == tail.Row - 2)
-            {
-                tail.Row--;
-                tail.Column--;
-            }
-            else
-            {
-                tail.Row = head.PreviousRow;
-                tail.Column = head.PreviousColumn;
-            }
+            tail.Column -= step;
         }
     }
 
     private static void Print(List<Knot> snake)
     {
-        for (var r = 25; r > -25; r--)
+        for (var r = 20; r > -20; r--)
         {
-            for (var c = -25; c < 25; c++)
+            for (var c = -20; c < 20; c++)
             {
                 var maybeKnot = snake.FirstOrDefault(s => s.Row == r && s.Column == c);
                 if (maybeKnot != null)
