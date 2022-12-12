@@ -45,7 +45,8 @@ public static class Solution
             snake.Add(new Knot
             {
                 Row = 0,
-                Column = 0
+                Column = 0,
+                Name = i.ToString()
             });
         }
         var tailPositions = new HashSet<string>();
@@ -56,14 +57,16 @@ public static class Solution
             var direction = parts[0];
             var steps = int.Parse(parts[1]);
             
+            Console.WriteLine(move);
+            
             while (steps > 0)
             {
-                Console.WriteLine($"Move head {direction}");
+                Print(snake);
                 MoveHead(snake[0], direction);
 
                 for (var i = 0; i < 9; i++)
                 {
-                    Follow(snake[i], snake[i + 1], i + 1);
+                    Follow(snake[i], snake[i + 1]);
                 }
                 
                 if (!tailPositions.Contains($"{snake[9].Row}{snake[9].Column}"))
@@ -162,71 +165,116 @@ public static class Solution
         }
     }
     
-    private static void Follow(Knot head, Knot tail, int tailIndex)
+    private static void Follow(Knot head, Knot tail)
     {
         if (head.Row == tail.Row + 2)
         {
-            tail.Row++;
-            Console.WriteLine($"{tailIndex} move up");
-
-            if (head.Column == tail.Column - 1)
+            if (head.Column == tail.Column)
             {
-                tail.Column--;
-                Console.WriteLine($"{tailIndex} move left");
+                tail.Row++;
             }
-            else if (head.Column == tail.Column + 1)
+            else if (head.Column == tail.Column + 2)
             {
+                tail.Row++;
                 tail.Column++;
-                Console.WriteLine($"{tailIndex} move right");
+            }
+            else if (head.Column == tail.Column - 2)
+            {
+                tail.Row++;
+                tail.Column--;
+            }
+            else
+            {
+                tail.Row = head.PreviousRow;
+                tail.Column = head.PreviousColumn;
             }
         }
         else if (head.Row == tail.Row - 2)
         {
-            tail.Row--;
-            Console.WriteLine($"{tailIndex} move down");
-
-            if (head.Column == tail.Column - 1)
+            if (head.Column == tail.Column)
             {
-                tail.Column--;
-                Console.WriteLine($"{tailIndex} move left");
+                tail.Row--;
             }
-            else if (head.Column == tail.Column + 1)
+            else if (head.Column == tail.Column + 2)
             {
+                tail.Row--;
                 tail.Column++;
-                Console.WriteLine($"{tailIndex} move right");
+            }
+            else if (head.Column == tail.Column - 2)
+            {
+                tail.Row--;
+                tail.Column--;
+            }
+            else
+            {
+                tail.Row = head.PreviousRow;
+                tail.Column = head.PreviousColumn;
             }
         }
         else if (head.Column == tail.Column + 2)
         {
-            tail.Column++;
-            Console.WriteLine($"{tailIndex} move right");
-
-            if (head.Row == tail.Row - 1)
+            if (head.Row == tail.Row)
             {
-                tail.Row--;
-                Console.WriteLine($"{tailIndex} move down");
+                tail.Column++;
             }
-            else if (head.Row == tail.Row + 1)
+            else if (head.Row == tail.Row + 2)
             {
                 tail.Row++;
-                Console.WriteLine($"{tailIndex} move up");
+                tail.Column++;
+            }
+            else if (head.Row == tail.Row - 2)
+            {
+                tail.Row--;
+                tail.Column++;
+            }
+            else
+            {
+                tail.Row = head.PreviousRow;
+                tail.Column = head.PreviousColumn;
             }
         }
         else if (head.Column == tail.Column - 2)
         {
-            tail.Column--;
-            Console.WriteLine($"{tailIndex} move left");
-
-            if (head.Row == tail.Row - 1)
+            if (head.Row == tail.Row)
             {
-                tail.Row--;
-                Console.WriteLine($"{tailIndex} move down");
+                tail.Column--;
             }
-            else if (head.Row == tail.Row + 1)
+            else if (head.Row == tail.Row + 2)
             {
                 tail.Row++;
-                Console.WriteLine($"{tailIndex} move up");
+                tail.Column--;
+            }
+            else if (head.Row == tail.Row - 2)
+            {
+                tail.Row--;
+                tail.Column--;
+            }
+            else
+            {
+                tail.Row = head.PreviousRow;
+                tail.Column = head.PreviousColumn;
             }
         }
+    }
+
+    private static void Print(List<Knot> snake)
+    {
+        for (var r = 25; r > -25; r--)
+        {
+            for (var c = -25; c < 25; c++)
+            {
+                var maybeKnot = snake.FirstOrDefault(s => s.Row == r && s.Column == c);
+                if (maybeKnot != null)
+                    Console.Write(maybeKnot.Name);
+                else if (r == 0 && c == 0)
+                    Console.Write("s");
+                else
+                    Console.Write(".");
+            }
+            
+            Console.WriteLine();
+        }
+        
+        Console.WriteLine();
     }
 }
