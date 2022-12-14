@@ -47,8 +47,89 @@ public static class Solution
 
     public static string SolvePart2(IEnumerable<string> data)
     {
-        return "";
+        var (map, xOffset) = ParseMap(data);
+        var sandCount = 0;
+        var dropPoint = (x: 500 - xOffset, y: 0); 
+        var sand = dropPoint;
+        var empty = '\0';
+        var infiniteSpace = new HashSet<(int x, int y)>();
+        var floorIndex = map.GetLength(1) + 1;
+
+        while (true)
+        {
+            if (sand.y + 1 >= map.GetLength(1)
+                || sand.x - 1 < 0
+                || sand.x + 1 >= map.GetLength(0))
+            {
+                if (!infiniteSpace.Contains((sand.x, sand.y + 1)) 
+                    && sand.y + 1 < floorIndex
+                    && (!map.IsInBounds((sand.x, sand.y + 1)) 
+                        || map[sand.x, sand.y + 1] == empty))
+                {
+                    sand.y++;
+                }
+                else if (!infiniteSpace.Contains((sand.x - 1, sand.y + 1)) 
+                         && sand.y + 1 < floorIndex
+                         && (!map.IsInBounds((sand.x - 1, sand.y + 1)) 
+                             || map[sand.x - 1, sand.y + 1] == empty))
+                {
+                    sand.x--;
+                    sand.y++;
+                }
+                else if (!infiniteSpace.Contains((sand.x + 1, sand.y + 1)) 
+                         && sand.y + 1 < floorIndex
+                         && (!map.IsInBounds((sand.x + 1, sand.y + 1))
+                            || map[sand.x + 1, sand.y + 1] == empty))
+                {
+                    sand.x++;
+                    sand.y++;
+                }
+                else
+                {
+                    if (map.IsInBounds(sand))
+                    {
+                        map[sand.x, sand.y] = 'o';
+                    }
+                    
+                    sandCount++;
+                    infiniteSpace.Add((sand.x, sand.y));
+                    sand = dropPoint;
+                }
+            }
+            else if (map[sand.x, sand.y + 1] == empty)
+            {
+                sand.y++;
+            }
+            else if (map[sand.x - 1, sand.y + 1] == empty)
+            {
+                sand.x--;
+                sand.y++;
+            }
+            else if (map[sand.x + 1, sand.y + 1] == empty)
+            {
+                sand.x++;
+                sand.y++;
+            }
+            else
+            {
+                if (map[dropPoint.x, dropPoint.y] != empty)
+                    break;
+                
+                sandCount++;
+                map[sand.x, sand.y] = 'o';
+                sand = dropPoint;
+                // PrintMap2(map, infiniteSpace);
+            }
+        }
+        
+        return sandCount.ToString();
     }
+
+    private static bool IsInBounds(this char[,] map, (int x, int y) point) =>
+        point.x >= 0
+        && point.x < map.GetLength(0)
+        && point.y >= 0
+        && point.y < map.GetLength(1);
 
     private static (char[,], int) ParseMap(IEnumerable<string> data)
     {
@@ -112,5 +193,37 @@ public static class Solution
 
             Console.WriteLine();
         }
+
+        Console.WriteLine();
+    }
+    
+    private static void PrintMap2(char[,] map, HashSet<(int x, int y)> infiniteSpace)
+    {
+        var infMinX = infiniteSpace.Any() ? infiniteSpace.Min(set => set.x) : 0;
+        var infMaxX = infiniteSpace.Any() ? infiniteSpace.Max(set => set.x) : 0;
+        var infMinY = infiniteSpace.Any() ? infiniteSpace.Min(set => set.y) : 0;
+        var infMaxY = infiniteSpace.Any() ? infiniteSpace.Max(set => set.y) : 0;
+        
+        var minX = Math.Min(0, infMinX);
+        var maxX = Math.Max(map.GetLength(0), infMaxX);
+        var minY = Math.Min(0, infMinY);
+        var maxY = Math.Max(map.GetLength(1), infMaxY);
+        
+        for (var y = minY; y <= maxY; y++)
+        {
+            for (var x = minX; x <= maxX; x++)
+            {
+                if (map.IsInBounds((x, y)) && map[x, y] != '\0')
+                    Console.Write(map[x, y]);
+                else if (infiniteSpace.Contains((x, y)))
+                    Console.Write("o");
+                else 
+                    Console.Write(".");
+            }
+
+            Console.WriteLine();
+        }
+
+        Console.WriteLine();
     }
 }
