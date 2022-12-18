@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using Solutions.Day14;
+using Solutions.Day15;
 
 var inputFile = $"Input{Solution.Day}.txt";
 
@@ -28,7 +28,7 @@ Console.WriteLine();
 
 var stopwatch = new Stopwatch();
 stopwatch.Start();
-var part1 = Solution.SolvePart1(data);
+var part1 = Solution.SolvePart1(data, 2000000);
 stopwatch.Stop();
 Console.WriteLine($"Part 1 ({stopwatch.ElapsedMilliseconds} ms)");
 Console.WriteLine(part1);
