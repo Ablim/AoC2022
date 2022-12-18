@@ -16,7 +16,7 @@ public class Tests
     public async Task Part2()
     {
         var data = await File.ReadAllLinesAsync($"Day{Solution.Day}/Data.txt");
-        var result = Solution.SolvePart2(data);
-        Assert.Equal("93", result);
+        var result = Solution.SolvePart2(data, 20);
+        Assert.Equal("56000011", result);
     }
 }

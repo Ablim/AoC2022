@@ -32,9 +32,41 @@ public static class Solution
         return counter.ToString();
     }
     
-    public static string SolvePart2(IEnumerable<string> data)
+    public static string SolvePart2(IEnumerable<string> data, int maxValue)
     {
-        return "";
+        var pairs = Parse(data);
+
+        for (var y = 0; y <= maxValue; y++)
+        {
+            for (var x = 0; x <= maxValue; x++)
+            {
+                var found = true;
+                
+                foreach (var pair in pairs)
+                {
+                    var distance = GetDistance((x, y), (pair.sX, pair.sY));
+                    if (distance <= pair.distance 
+                        || x == pair.sX && y == pair.sY 
+                        || x == pair.bX && y == pair.bY)
+                    {
+                        var yComponent = Math.Abs(y - pair.sY);
+                        var xComponent = pair.distance - yComponent;
+                        x = pair.sX + xComponent;
+                        
+                        found = false;
+                        break;
+                    }
+                }
+                
+                if (found)
+                {
+                    var value = x * (long)4000000 + y;
+                    return value.ToString();
+                }
+            }
+        }
+
+        return string.Empty;
     }
     
     private static List<(int sX, int sY, int bX, int bY, int distance)> Parse(IEnumerable<string> data) => data

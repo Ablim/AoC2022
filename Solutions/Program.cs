@@ -35,7 +35,7 @@ Console.WriteLine(part1);
 Console.WriteLine();
 
 stopwatch.Restart();
-var part2 = Solution.SolvePart2(data);
+var part2 = Solution.SolvePart2(data, 4000000);
 stopwatch.Stop();
 Console.WriteLine($"Part 2 ({stopwatch.ElapsedMilliseconds} ms)");
 Console.WriteLine(part2);
