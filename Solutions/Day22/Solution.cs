@@ -6,33 +6,7 @@ public static class Solution
     
     public static string SolvePart1(IEnumerable<string> data)
     {
-        var dataList = data.ToList();
-        var mapRaw = dataList
-            .TakeWhile(row => !string.IsNullOrEmpty(row))
-            .ToList();
-        var width = mapRaw.Max(row => row.Length);
-        var height = mapRaw.Count;
-        var map = new char[height, width];
-        var startColumn = -1;
-
-        for (var row = 0; row < height; row++)
-        {
-            var rowData = mapRaw[row].ToCharArray();
-            for (var col = 0; col < rowData.Length; col++)
-            {
-                if (rowData[col] == ' ')
-                    continue;
-
-                if (startColumn < 0 && rowData[col] == '.')
-                    startColumn = col;
-                
-                map[row, col] = rowData[col];
-            }
-        }
-        
-        var steps = dataList
-            .Last()
-            .ToList();
+        var (map, startColumn, steps) = Parse(data);
         var direction = Direction.Right;
         var currentRow = 0;
         var currentColumn = startColumn;
@@ -46,58 +20,7 @@ public static class Solution
             var stepCount = int.Parse(new string(stepCountParts));
             
             // Move
-            for (var i = 0; i < stepCount; i++)
-            {
-                switch (direction)
-                {
-                    case Direction.Right:
-                        var rightColumn = 
-                            currentColumn + 1 < width && map[currentRow, currentColumn + 1].IsVoid() 
-                            || currentColumn + 1 >= width 
-                                ? LoopAroundRight(map, currentRow, width) 
-                                : currentColumn + 1;
-                        
-                        if (map[currentRow, rightColumn] == '.')
-                            currentColumn = rightColumn;
-
-                        break;
-                    case Direction.Down:
-                        var downRow = 
-                            currentRow + 1 < height && map[currentRow + 1, currentColumn].IsVoid()
-                            || currentRow + 1 >= height 
-                                ? LoopAroundDown(map, currentColumn, height) 
-                                : currentRow + 1;
-                        
-                        if (map[downRow, currentColumn] == '.')
-                            currentRow = downRow;
-                        
-                        break;
-                    case Direction.Left:
-                        var leftColumn = 
-                            currentColumn - 1 >= 0 && map[currentRow, currentColumn - 1].IsVoid() 
-                            || currentColumn - 1 < 0 
-                                ? LoopAroundLeft(map, currentRow, width) 
-                                : currentColumn - 1;
-                        
-                        if (map[currentRow, leftColumn] == '.')
-                            currentColumn = leftColumn;
-                        
-                        break;
-                    case Direction.Up:
-                        var upRow = 
-                            currentRow - 1 >= 0 && map[currentRow - 1, currentColumn].IsVoid() 
-                            || currentRow - 1 < 0 
-                                ? LoopAroundUp(map, currentColumn, height) 
-                                : currentRow - 1;
-                        
-                        if (map[upRow, currentColumn] == '.')
-                            currentRow = upRow;
-                        
-                        break;
-                    default:
-                        break;
-                }
-            }
+            (currentRow, currentColumn) = Move(map, stepCount, direction, currentRow, currentColumn);
 
             // Rotate
             if (steps.FirstOrDefault() == 'R')
@@ -120,7 +43,39 @@ public static class Solution
 
     public static string SolvePart2(IEnumerable<string> data)
     {
-        return "";
+        var (map, startColumn, steps) = Parse(data);
+        var direction = Direction.Right;
+        var currentRow = 0;
+        var currentColumn = startColumn;
+        
+        while (steps.Any())
+        {
+            var stepCountParts = steps
+                .TakeWhile(s => s != 'R' && s != 'L')
+                .ToArray();
+            steps.RemoveRange(0, stepCountParts.Length);
+            var stepCount = int.Parse(new string(stepCountParts));
+            
+            // Move
+            (currentRow, currentColumn) = Move(map, stepCount, direction, currentRow, currentColumn);
+
+            // Rotate
+            if (steps.FirstOrDefault() == 'R')
+            {
+                direction = Rotate(direction, Direction.Right);
+                steps.RemoveAt(0);
+            }
+
+            if (steps.FirstOrDefault() == 'L')
+            {
+                direction = Rotate(direction, Direction.Left);
+                steps.RemoveAt(0);
+            }
+        }
+        
+        return (1000 * (currentRow + 1) 
+                + 4 * (currentColumn + 1) 
+                + direction).ToString();
     }
     
     private static int LoopAroundRight(char[,] map, int currentRow, int width)
@@ -206,4 +161,102 @@ public static class Solution
     }
 
     private static bool IsVoid(this char c) => c is ' ' or '\0';
+
+    private static (char[,] map, int startColumn, List<char> steps) Parse(IEnumerable<string> data)
+    {
+        var mapRaw = new List<string>();
+        var steps = new List<char>();
+
+        foreach (var row in data)
+        {
+            if (row.Contains('.') || row.Contains('#'))
+                mapRaw.Add(row);
+
+            if (row.Contains('R') || row.Contains('L'))
+                steps = row.ToList();
+        }
+        
+        var width = mapRaw.Max(row => row.Length);
+        var height = mapRaw.Count;
+        var map = new char[height, width];
+        var startColumn = -1;
+
+        for (var row = 0; row < height; row++)
+        {
+            var rowData = mapRaw[row].ToCharArray();
+            for (var col = 0; col < rowData.Length; col++)
+            {
+                if (rowData[col] == ' ')
+                    continue;
+
+                if (startColumn < 0 && rowData[col] == '.')
+                    startColumn = col;
+                
+                map[row, col] = rowData[col];
+            }
+        }
+
+        return (map, startColumn, steps);
+    }
+
+    private static (int newRow, int newColumn) Move(char[,] map, int steps, Direction direction, int row, int column)
+    {
+        var height = map.GetLength(0);
+        var width = map.GetLength(1);
+        
+        for (var i = 0; i < steps; i++)
+        {
+            switch (direction)
+            {
+                case Direction.Right:
+                    var rightColumn = 
+                        column + 1 < width && map[row, column + 1].IsVoid() 
+                        || column + 1 >= width 
+                            ? LoopAroundRight(map, row, width) 
+                            : column + 1;
+                    
+                    if (map[row, rightColumn] == '.')
+                        column = rightColumn;
+
+                    break;
+                case Direction.Down:
+                    var downRow = 
+                        row + 1 < height && map[row + 1, column].IsVoid()
+                        || row + 1 >= height 
+                            ? LoopAroundDown(map, column, height) 
+                            : row + 1;
+                    
+                    if (map[downRow, column] == '.')
+                        row = downRow;
+                    
+                    break;
+                case Direction.Left:
+                    var leftColumn = 
+                        column - 1 >= 0 && map[row, column - 1].IsVoid() 
+                        || column - 1 < 0 
+                            ? LoopAroundLeft(map, row, width) 
+                            : column - 1;
+                    
+                    if (map[row, leftColumn] == '.')
+                        column = leftColumn;
+                    
+                    break;
+                case Direction.Up:
+                    var upRow = 
+                        row - 1 >= 0 && map[row - 1, column].IsVoid() 
+                        || row - 1 < 0 
+                            ? LoopAroundUp(map, column, height) 
+                            : row - 1;
+                    
+                    if (map[upRow, column] == '.')
+                        row = upRow;
+                    
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return (row, column);
+    }
 }
