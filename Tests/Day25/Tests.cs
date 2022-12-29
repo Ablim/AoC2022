@@ -1,6 +1,6 @@
-using Solutions.Day22;
+using Solutions.Day25;
 
-namespace Tests.Day22;
+namespace Tests.Day25;
 
 public class Tests
 {
@@ -9,7 +9,7 @@ public class Tests
     {
         var data = await File.ReadAllLinesAsync($"Day{Solution.Day}/Data.txt");
         var result = Solution.SolvePart1(data);
-        Assert.Equal("6032", result);
+        Assert.Equal("2=-1=0", result);
     }
     
     [Fact]
@@ -17,6 +17,6 @@ public class Tests
     {
         var data = await File.ReadAllLinesAsync($"Day{Solution.Day}/Data.txt");
         var result = Solution.SolvePart2(data);
-        // Assert.Equal("5031", result);
+        Assert.Equal("5031", result);
     }
 }
