@@ -8,7 +8,7 @@ public static class Solution
     {
         return data
             .Select(ToDecimal)
-            .Sum()
+            .LongSum()
             .ToSnafu();
     }
 
@@ -17,54 +17,55 @@ public static class Solution
         return "";
     }
 
-    private static int ToDecimal(this string number)
+    private static long ToDecimal(this string number) => number
+        .ToCharArray()
+        .Select(MapSnafu)
+        .ToArray()
+        .Evaluate();
+
+    private static long Evaluate(this int[] snafuParts)
     {
-        var snafuParts = number
-            .ToCharArray()
-            .Select(MapSnafu)
-            .ToArray();
-        var decimalParts = new int[snafuParts.Length];
+        var decimalParts = new long[snafuParts.Length];
 
         for (var i = 0; i < snafuParts.Length; i++)
         {
             var power = snafuParts.Length - 1 - i;
-            decimalParts[i] = snafuParts[i] * (int)Math.Pow(5, power);
+            decimalParts[i] = snafuParts[i] * (long)Math.Pow(5, power);
         }
         
-        return decimalParts.Sum();
+        return decimalParts.LongSum();
     }
     
-    private static string ToSnafu(this int number)
+    private static string ToSnafu(this long number)
     {
-        var decimalParts = number
-            .ToString()
-            .ToCharArray()
-            .Select(c => int.Parse(c.ToString()))
-            .ToArray();
-        var snafuParts = new List<int>();
-
-        for (var i = 0; i < decimalParts.Length; i++)
+        var exponent = 0;
+        while (2 * Math.Pow(5, exponent) < number)
         {
-            var power = decimalParts.Length - 1 - i;
-            var decimalValue = decimalParts[i] * Math.Pow(10, power);
-            
-            // x * 5^y = 4000
-            var snafuPower = 0;
-            var decimalCopy = decimalValue;
-                
-            while (decimalCopy / 5 >= 1)
-            {
-                decimalCopy /= 5;
-                snafuPower++;
-            }
-
-            var snafuFactor = decimalValue / Math.Pow(5, snafuPower);
-            snafuParts.Add((int)snafuFactor);
+            exponent++;
         }
-        
-        return new string(snafuParts
+
+        return new string(Explore(new int[exponent + 1], 0, number)
             .Select(MapSnafu)
             .ToArray());
+    }
+
+    private static int[] Explore(int[] word, int index, long target)
+    {
+        if (index == word.Length)
+            return word;
+        
+        for (var i = -2; i <= 2; i++)
+        {
+            var copy = new int[word.Length];
+            Array.Copy(word, copy, word.Length);
+            copy[index] = i;
+            
+            var result = Explore(copy, index + 1, target);
+            if (result.Evaluate() == target)
+                return result;
+        }
+
+        return Array.Empty<int>();
     }
 
     private static int MapSnafu(this char snafu) =>
@@ -88,4 +89,7 @@ public static class Solution
             -2 => '=',
             _ => throw new InvalidOperationException()
         };
+
+    private static long LongSum(this IEnumerable<long> word) =>
+        word.Aggregate<long, long>(0, (current, number) => current + number);
 }
