@@ -44,7 +44,8 @@ public static class Solution
             exponent++;
         }
 
-        return new string(Explore(new int[exponent + 1], 0, number)
+        return new string(
+            Explore(new int[exponent + 1], 0, number)
             .Select(MapSnafu)
             .ToArray());
     }
@@ -54,18 +55,22 @@ public static class Solution
         if (index == word.Length)
             return word;
         
+        var distance = long.MaxValue;
+        var nextChar = 0;
+
         for (var i = -2; i <= 2; i++)
         {
-            var copy = new int[word.Length];
-            Array.Copy(word, copy, word.Length);
-            copy[index] = i;
-            
-            var result = Explore(copy, index + 1, target);
-            if (result.Evaluate() == target)
-                return result;
+            word[index] = i;
+
+            if (Math.Abs(word.Evaluate() - target) < distance)
+            {
+                distance = Math.Abs(word.Evaluate() - target);
+                nextChar = i;
+            }
         }
 
-        return Array.Empty<int>();
+        word[index] = nextChar;
+        return Explore(word, index + 1, target);
     }
 
     private static int MapSnafu(this char snafu) =>
