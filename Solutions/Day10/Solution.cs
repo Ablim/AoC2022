@@ -44,6 +44,51 @@ public static class Solution
 
     public static string SolvePart2(IEnumerable<string> data)
     {
-        return "";
+        var dataList = data.ToList();
+        var display = new char[240];
+        var register = 1;
+        var instruction = string.Empty;
+
+        for (var i = 0; i < 240; i++)
+        {
+            if (i > 0 && i % 40 == 0)
+                register += 40;
+            
+            if (i >= register - 1 && i <= register + 1)
+                display[i] = '#';
+            else
+                display[i] = '.';
+
+            if (instruction == string.Empty)
+            {
+                var temp = dataList.First();
+                dataList.RemoveAt(0);
+
+                if (temp.StartsWith("addx"))
+                    instruction = temp;
+            }
+            else
+            {
+                register += int.Parse(instruction.Split(' ')[1]);
+                instruction = string.Empty;
+            }
+        }
+        
+        display.Print();
+        return register.ToString();
+    }
+
+    private static void Print(this char[] display)
+    {
+        for (var i = 0; i < display.Length; i++)
+        {
+            if (i > 0 && i % 40 == 0)
+                Console.WriteLine();
+            
+            Console.Write(display[i]);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine();
     }
 }
