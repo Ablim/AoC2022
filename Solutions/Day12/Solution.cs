@@ -9,12 +9,13 @@ public static class Solution
         var map = data
             .Select(row => row.ToArray())
             .ToArray();
-        var start = FindStart(map);
+        var start = Find(map, 'S');
+        var end = Find(map, 'E');
         var paths = new SortedSet<Path>();
         paths.Add(new Path
         {
             Head = start,
-            Steps = new HashSet<(int row, int column)>
+            Steps = new HashSet<Point>
             {
                 start
             }
@@ -22,93 +23,53 @@ public static class Solution
 
         while (paths.Any())
         {
-            var shortest = paths.Min ?? throw new InvalidOperationException();
-            var level = map[shortest.Head.row][shortest.Head.column];
+            var path = paths.Min ?? throw new InvalidOperationException();
+            var current = map[path.Head.Row][path.Head.Column];
 
-            if (level == 'E')
+            if (current == 'E')
                 break;
 
-            if (shortest.Head.row - 1 >= 0)
+            if (path.Head.Row - 1 >= 0)
             {
-                var up = map[shortest.Head.row - 1][shortest.Head.column];
-                if (up.Score() >= level.Score() - 1 && up.Score() <= level.Score() + 1)
+                var upPoint = new Point
                 {
-                    if (!shortest.Steps.Contains((shortest.Head.row - 1, shortest.Head.column)))
-                    {
-                        var copy = new HashSet<(int row, int column)>(shortest.Steps)
-                        {
-                            (shortest.Head.row - 1, shortest.Head.column)
-                        };
-                        paths.Add(new Path
-                        {
-                            Head = (shortest.Head.row - 1, shortest.Head.column),
-                            Steps = copy
-                        });
-                    }
-                }
+                    Row = path.Head.Row - 1,
+                    Column = path.Head.Column
+                };
+                CheckStep(current, upPoint, map, path, paths, end);
             }
             
-            if (shortest.Head.row + 1 < map.Length)
+            if (path.Head.Row + 1 < map.Length)
             {
-                var down = map[shortest.Head.row + 1][shortest.Head.column];
-                if (down.Score() >= level.Score() - 1 && down.Score() <= level.Score() + 1)
+                var downPoint = new Point
                 {
-                    if (!shortest.Steps.Contains((shortest.Head.row + 1, shortest.Head.column)))
-                    {
-                        var copy = new HashSet<(int row, int column)>(shortest.Steps)
-                        {
-                            (shortest.Head.row + 1, shortest.Head.column)
-                        };
-                        paths.Add(new Path
-                        {
-                            Head = (shortest.Head.row + 1, shortest.Head.column),
-                            Steps = copy
-                        });
-                    }
-                }
+                    Row = path.Head.Row + 1,
+                    Column = path.Head.Column
+                };
+                CheckStep(current, downPoint, map, path, paths, end);
             }
             
-            if (shortest.Head.column - 1 >= 0)
+            if (path.Head.Column - 1 >= 0)
             {
-                var left = map[shortest.Head.row][shortest.Head.column - 1];
-                if (left.Score() >= level.Score() - 1 && left.Score() <= level.Score() + 1)
+                var leftPoint = new Point
                 {
-                    if (!shortest.Steps.Contains((shortest.Head.row, shortest.Head.column - 1)))
-                    {
-                        var copy = new HashSet<(int row, int column)>(shortest.Steps)
-                        {
-                            (shortest.Head.row, shortest.Head.column - 1)
-                        };
-                        paths.Add(new Path
-                        {
-                            Head = (shortest.Head.row, shortest.Head.column - 1),
-                            Steps = copy
-                        });
-                    }
-                }
+                    Row = path.Head.Row,
+                    Column = path.Head.Column - 1
+                };
+                CheckStep(current, leftPoint, map, path, paths, end);
             }
             
-            if (shortest.Head.column + 1 < map[0].Length)
+            if (path.Head.Column + 1 < map[0].Length)
             {
-                var right = map[shortest.Head.row][shortest.Head.column + 1];
-                if (right.Score() >= level.Score() - 1 && right.Score() <= level.Score() + 1)
+                var rightPoint = new Point
                 {
-                    if (!shortest.Steps.Contains((shortest.Head.row, shortest.Head.column + 1)))
-                    {
-                        var copy = new HashSet<(int row, int column)>(shortest.Steps)
-                        {
-                            (shortest.Head.row, shortest.Head.column + 1)
-                        };
-                        paths.Add(new Path
-                        {
-                            Head = (shortest.Head.row, shortest.Head.column + 1),
-                            Steps = copy
-                        });
-                    }
-                }
+                    Row = path.Head.Row,
+                    Column = path.Head.Column + 1
+                };
+                CheckStep(current, rightPoint, map, path, paths, end);
             }
 
-            paths.Remove(shortest);
+            paths.Remove(path);
         }
         
         return (paths.Min?.Length - 1).ToString() ?? "0";
@@ -119,18 +80,22 @@ public static class Solution
         return "";
     }
 
-    private static (int row, int column) FindStart(char[][] map)
+    private static Point Find(char[][] map, char point)
     {
         for (var row = 0; row < map.Length; row++)
         {
             for (var col = 0; col < map[0].Length; col++)
             {
-                if (map[row][col] == 'S')
-                    return (row, col);
+                if (map[row][col] == point)
+                    return new Point
+                    {
+                        Row = row,
+                        Column = col
+                    };
             }
         }
 
-        return (0, 0);
+        return new Point();
     }
 
     private static int Score(this char level) =>
@@ -140,4 +105,25 @@ public static class Solution
             'E' => 'z',
             _ => level
         };
+
+    private static void CheckStep(char level, Point point, char[][] map, Path shortest, SortedSet<Path> paths, Point end)
+    {
+        var next = map[point.Row][point.Column];
+                
+        if (next.Score() >= level.Score() - 1 && next.Score() <= level.Score() + 1)
+        {
+            if (!shortest.Steps.Contains(point))
+            {
+                var copy = new HashSet<Point>(shortest.Steps)
+                {
+                    point
+                };
+                paths.Add(new Path
+                {
+                    Head = point,
+                    Steps = copy
+                });
+            }
+        }
+    }
 }
