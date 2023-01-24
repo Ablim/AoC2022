@@ -9,8 +9,8 @@ public static class Solution
         var map = data
             .Select(row => row.ToArray())
             .ToArray();
+        var mapCost = BuildCostMap(map.Length, map[0].Length);
         var start = Find(map, 'S');
-        var end = Find(map, 'E');
         var paths = new SortedSet<Path>();
         paths.Add(new Path
         {
@@ -36,7 +36,7 @@ public static class Solution
                     Row = path.Head.Row - 1,
                     Column = path.Head.Column
                 };
-                CheckStep(current, upPoint, map, path, paths, end);
+                CheckStep(current, upPoint, map, path, paths, mapCost);
             }
             
             if (path.Head.Row + 1 < map.Length)
@@ -46,7 +46,7 @@ public static class Solution
                     Row = path.Head.Row + 1,
                     Column = path.Head.Column
                 };
-                CheckStep(current, downPoint, map, path, paths, end);
+                CheckStep(current, downPoint, map, path, paths, mapCost);
             }
             
             if (path.Head.Column - 1 >= 0)
@@ -56,7 +56,7 @@ public static class Solution
                     Row = path.Head.Row,
                     Column = path.Head.Column - 1
                 };
-                CheckStep(current, leftPoint, map, path, paths, end);
+                CheckStep(current, leftPoint, map, path, paths, mapCost);
             }
             
             if (path.Head.Column + 1 < map[0].Length)
@@ -66,12 +66,13 @@ public static class Solution
                     Row = path.Head.Row,
                     Column = path.Head.Column + 1
                 };
-                CheckStep(current, rightPoint, map, path, paths, end);
+                CheckStep(current, rightPoint, map, path, paths, mapCost);
             }
 
             paths.Remove(path);
         }
         
+        // Print(mapCost);
         return (paths.Min?.Length - 1).ToString() ?? "0";
     }
 
@@ -106,24 +107,72 @@ public static class Solution
             _ => level
         };
 
-    private static void CheckStep(char level, Point point, char[][] map, Path shortest, SortedSet<Path> paths, Point end)
+    private static void CheckStep(char level, Point point, char[][] map, Path shortest, SortedSet<Path> paths, int[,] mapCost)
     {
         var next = map[point.Row][point.Column];
-                
-        if (next.Score() >= level.Score() - 1 && next.Score() <= level.Score() + 1)
+        
+        if (next.Score() <= level.Score() + 1
+            && !shortest.Steps.Contains(point)
+            && shortest.Length + 1 < mapCost[point.Row, point.Column])
         {
-            if (!shortest.Steps.Contains(point))
+            paths.Add(new Path
             {
-                var copy = new HashSet<Point>(shortest.Steps)
+                Head = point,
+                Steps = new HashSet<Point>(shortest.Steps)
                 {
                     point
-                };
-                paths.Add(new Path
-                {
-                    Head = point,
-                    Steps = copy
-                });
+                }
+            });
+            mapCost[point.Row, point.Column] = shortest.Length + 1;
+        }
+    }
+
+    private static int[,] BuildCostMap(int rows, int columns)
+    {
+        var costMap = new int[rows, columns];
+
+        for (var row = 0; row < rows; row++)
+        {
+            for (var col = 0; col < columns; col++)
+            {
+                costMap[row, col] = int.MaxValue;
             }
         }
+        
+        return costMap;
+    }
+
+    private static void Print(this int[,] costMap)
+    {
+        for (var row = 0; row < costMap.GetLength(0); row++)
+        {
+            for (var col = 0; col < costMap.GetLength(1); col++)
+            {
+                if (costMap[row, col] == int.MaxValue)
+                {
+                    Console.Write("___ ");
+                }
+                else
+                {
+                    var value = costMap[row, col].ToString();
+                    if (value.Length == 1)
+                    {
+                        Console.Write($"  {value} ");
+                    }
+                    if (value.Length == 2)
+                    {
+                        Console.Write($" {value} ");
+                    }
+                    if (value.Length > 2)
+                    {
+                        Console.Write($"{value} ");
+                    }
+                }
+            }
+
+            Console.WriteLine();
+        }
+
+        Console.WriteLine();
     }
 }
