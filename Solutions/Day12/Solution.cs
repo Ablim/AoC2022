@@ -9,8 +9,33 @@ public static class Solution
         var map = data
             .Select(row => row.ToArray())
             .ToArray();
-        var mapCost = BuildCostMap(map.Length, map[0].Length);
         var start = Find(map, 'S');
+        
+        return (GetShortestPath(map, start)?.Length - 1).ToString() ?? "0";
+    }
+
+    public static string SolvePart2(IEnumerable<string> data)
+    {
+        var map = data
+            .Select(row => row.ToArray())
+            .ToArray();
+        var startPoints = FindAll(map, 'a');
+        startPoints.Add(Find(map, 'S'));
+
+        var paths = new List<Path>();
+        startPoints.ForEach(p =>
+        {
+            var path = GetShortestPath(map, p);
+            if (path != null)
+                paths.Add(path);
+        });
+        
+        return (paths.MinBy(p => p.Length)?.Length - 1).ToString() ?? "0";
+    }
+
+    private static Path? GetShortestPath(char[][] map, Point start)
+    {
+        var mapCost = BuildCostMap(map.Length, map[0].Length);
         var paths = new SortedSet<Path>();
         paths.Add(new Path
         {
@@ -20,7 +45,7 @@ public static class Solution
                 start
             }
         });
-
+        
         while (paths.Any())
         {
             var path = paths.Min ?? throw new InvalidOperationException();
@@ -73,14 +98,9 @@ public static class Solution
         }
         
         // Print(mapCost);
-        return (paths.Min?.Length - 1).ToString() ?? "0";
+        return paths.Min;
     }
-
-    public static string SolvePart2(IEnumerable<string> data)
-    {
-        return "";
-    }
-
+    
     private static Point Find(char[][] map, char point)
     {
         for (var row = 0; row < map.Length; row++)
@@ -97,6 +117,26 @@ public static class Solution
         }
 
         return new Point();
+    }
+    
+    private static List<Point> FindAll(char[][] map, char point)
+    {
+        var points = new List<Point>();
+        
+        for (var row = 0; row < map.Length; row++)
+        {
+            for (var col = 0; col < map[0].Length; col++)
+            {
+                if (map[row][col] == point)
+                    points.Add(new Point
+                    {
+                        Row = row,
+                        Column = col
+                    });
+            }
+        }
+
+        return points;
     }
 
     private static int Score(this char level) =>
