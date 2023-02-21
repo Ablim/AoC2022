@@ -14,7 +14,9 @@ public static class Solution
         _rates = ParseRates(dataList);
         _links = ParseLinks(dataList);
         
-        return LongestPath("AA", 30, 0, new HashSet<string>(), new Dictionary<string, int>{{"AA", 1}}).ToString();
+        var length = LongestPath("AA", 30, 0, 0, new HashSet<string>(), new Dictionary<string, int>{{"AA", 1}}).ToString();
+        Console.WriteLine($"Paths: {_completedPaths}");
+        return length;
     }
 
     public static string SolvePart2(IEnumerable<string> data)
@@ -60,7 +62,7 @@ public static class Solution
         return links;
     }
 
-    private static int LongestPath(string valve, int minutes, int length, HashSet<string> openValves, Dictionary<string, int> visitCount)
+    private static int LongestPath(string valve, int minutes, int length, int changeRate, HashSet<string> openValves, Dictionary<string, int> visitCount)
     {
         if (minutes == 0)
         {
@@ -69,9 +71,7 @@ public static class Solution
         }
 
         minutes--;
-        length += _rates
-            .Where(r => openValves.Contains(r.Key))
-            .Sum(r => r.Value);
+        length += changeRate;
         var lengths = new List<int>();
 
         // test to open valve
@@ -81,7 +81,7 @@ public static class Solution
             {
                 valve
             };
-            lengths.Add(LongestPath(valve, minutes, length, openValvesCopy, visitCount));
+            lengths.Add(LongestPath(valve, minutes, length, changeRate + _rates[valve], openValvesCopy, visitCount));
         }
 
         // test adjacent paths
@@ -96,12 +96,19 @@ public static class Solution
             else
                 visitCountCopy.Add(other, 1);
             
-            lengths.Add(LongestPath(other, minutes, length, openValves, visitCountCopy));
+            lengths.Add(LongestPath(other, minutes, length, changeRate, openValves, visitCountCopy));
         }
         
         // if no other options remain, stay put
         if (!lengths.Any())
-            lengths.Add(LongestPath(valve, minutes, length, openValves, visitCount));
+        {
+            for (var i = minutes; i > 0; i--)
+            {
+                length += changeRate;
+            }
+            
+            lengths.Add(LongestPath(valve, 0, length, changeRate, openValves, visitCount));
+        }
         
         return lengths.Max();
     }
