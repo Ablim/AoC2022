@@ -4,13 +4,16 @@ public static class Solution
 {
     public static int Day => 16;
     
+    private static Dictionary<string, int> _rates = new();
+    private static Dictionary<string, List<string>> _links = new();
+
     public static string SolvePart1(IEnumerable<string> data)
     {
         var dataList = data.ToList();
-        var rates = ParseRates(dataList);
-        var links = ParseLinks(dataList);
+        _rates = ParseRates(dataList);
+        _links = ParseLinks(dataList);
         
-        return LongestPath(rates, links, "AA", 30, 0, new HashSet<string>()).ToString();
+        return LongestPath("AA", 30, 0, new HashSet<string>(), new HashSet<string>()).ToString();
     }
 
     public static string SolvePart2(IEnumerable<string> data)
@@ -56,35 +59,46 @@ public static class Solution
         return links;
     }
 
-    private static int LongestPath(Dictionary<string, int> rates, Dictionary<string, List<string>> links, string valve,
-        int minutes, int length, HashSet<string> openValves)
+    private static int LongestPath(string valve, int minutes, int length, HashSet<string> openValves, HashSet<string> visitedEdges)
     {
         if (minutes == 0)
             return length;
 
         minutes--;
-        length += rates
+        length += _rates
             .Where(r => openValves.Contains(r.Key))
             .Sum(r => r.Value);
         
-        // if valve is not open, choose open or where to go next
-        // if valve is open, choose where to go next
         var lengths = new List<int>();
 
-        if (!openValves.Contains(valve) && rates[valve] > 0)
+        // test to open valve
+        if (!openValves.Contains(valve) && _rates[valve] > 0)
         {
             var openValvesCopy = new HashSet<string>(openValves)
             {
                 valve
             };
-            lengths.Add(LongestPath(rates, links, valve, minutes, length, openValvesCopy));
+            lengths.Add(LongestPath(valve, minutes, length, openValvesCopy, visitedEdges));
         }
 
-        foreach (var other in links[valve])
+        // test adjacent paths
+        foreach (var other in _links[valve])
         {
-            lengths.Add(LongestPath(rates, links, other, minutes, length, openValves));
+            var edgeKey = $"{valve}{other}";
+            if (visitedEdges.Contains(edgeKey))
+                continue;
+
+            var visitedEdgesCopy = new HashSet<string>(visitedEdges)
+            {
+                edgeKey
+            };
+            lengths.Add(LongestPath(other, minutes, length, openValves, visitedEdgesCopy));
         }
         
-        return lengths.Any() ? lengths.Max() : 0;
+        // if no other options remain, stay put
+        if (!lengths.Any())
+            lengths.Add(LongestPath(valve, minutes, length, openValves, visitedEdges));
+        
+        return lengths.Max();
     }
 }
