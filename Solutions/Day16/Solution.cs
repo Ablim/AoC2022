@@ -62,17 +62,17 @@ public static class Solution
         return links;
     }
 
-    private static int LongestPath(string valve, int minutes, int length, int changeRate, HashSet<string> openValves, Dictionary<string, int> visitCount)
+    private static int LongestPath(string valve, int minutes, int totalOutput, int changeRate, HashSet<string> openValves, Dictionary<string, int> visitCount)
     {
         if (minutes == 0)
         {
             _completedPaths++;
-            return length;
+            return totalOutput;
         }
 
         minutes--;
-        length += changeRate;
-        var lengths = new List<int>();
+        totalOutput += changeRate;
+        var paths = new List<int>();
 
         // test to open valve
         if (!openValves.Contains(valve) && _rates[valve] > 0)
@@ -81,7 +81,7 @@ public static class Solution
             {
                 valve
             };
-            lengths.Add(LongestPath(valve, minutes, length, changeRate + _rates[valve], openValvesCopy, visitCount));
+            paths.Add(LongestPath(valve, minutes, totalOutput, changeRate + _rates[valve], openValvesCopy, visitCount));
         }
 
         // test adjacent paths
@@ -96,20 +96,20 @@ public static class Solution
             else
                 visitCountCopy.Add(other, 1);
             
-            lengths.Add(LongestPath(other, minutes, length, changeRate, openValves, visitCountCopy));
+            paths.Add(LongestPath(other, minutes, totalOutput, changeRate, openValves, visitCountCopy));
         }
         
         // if no other options remain, stay put
-        if (!lengths.Any())
+        if (!paths.Any())
         {
             for (var i = minutes; i > 0; i--)
             {
-                length += changeRate;
+                totalOutput += changeRate;
             }
             
-            lengths.Add(LongestPath(valve, 0, length, changeRate, openValves, visitCount));
+            paths.Add(LongestPath(valve, 0, totalOutput, changeRate, openValves, visitCount));
         }
         
-        return lengths.Max();
+        return paths.Max();
     }
 }
